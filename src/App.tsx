@@ -1,3 +1,9 @@
+import Sidebar from './components/sidebar'
 export default function App() {
-  return <h1 className="text-3xl font-bold text-violet-600">Invoice App</h1>
+  return (
+    <div className='flex min-h-screen bg-page'>
+      <Sidebar />
+
+    </div>
+  )
 }
