@@ -1,13 +1,25 @@
 @import url("https://fonts.googleapis.com/css2?family=League+Spartan:wght@500;700&display=swap");
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
     --font-sans: "League Spartan", sans-serif;
 
     --color-primary: #7c5dfa;
+    --color-primary-light: #9277ff;
     --color-sidebar: #373b53;
     --color-page: #f8f8fb;
     --color-ink: #0c0e16;
+    --color-muted: #888eb0;
+    --color-muted-2: #7e88c3;
+    --color-light-1: #dfe3fa;
+    --color-danger: #ec5757;
+    --color-danger-light: #ff9797;
+    --color-dark-1: #1e2139;
+    --color-dark-2: #252945;
+    --color-dark-bg: #141625;
+    --color-dark-sidebar: #1e2139;
 }
 
 body {
@@ -17,4 +29,12 @@ body {
     letter-spacing: -0.1px;
     background-color: var(--color-page);
     color: var(--color-ink);
+}
+.dark {
+  color-scheme: dark;
+}
+
+.dark body {
+    background-color: var(--color-dark-bg);
+    color: #fff;
 }
