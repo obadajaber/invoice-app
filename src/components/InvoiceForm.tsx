@@ -1,13 +1,16 @@
 import { useState } from 'react'
 import FormField from './FormField'
+import type { Invoice } from '../types/invoice'
 
 type Item = { name: string; quantity: string; price: string }
 
 const emptyItem: Item = { name: '', quantity: '1', price: '' }
 
-type Props = { onClose: () => void }
-
-export default function InvoiceForm({ onClose }: Props) {
+type Props = {
+    onClose: () => void
+    onSave: (invoice: Invoice) => void
+}
+export default function InvoiceForm({ onClose, onSave  }: Props) {
     const [form, setForm] = useState({
         senderStreet: '', senderCity: '', senderPostCode: '', senderCountry: '',
         clientName: '', clientEmail: '',
@@ -48,10 +51,50 @@ export default function InvoiceForm({ onClose }: Props) {
         return Object.keys(e).length === 0
     }
 
-    function handleSend() {
-        if (!validate()) return
-        onClose()
+   
+
+function handleSend() {
+    if (!validate()) return
+
+    const date = new Date(form.invoiceDate)
+    const due = new Date(date)
+    due.setDate(due.getDate() + Number(form.paymentTerms))
+
+    const invoice: Invoice = {
+        id: `INV-${Date.now()}`,
+        createdAt: date.toISOString(),
+        paymentDue: due.toISOString().split('T')[0],
+        description: form.description,
+        paymentTerms: Number(form.paymentTerms),
+        clientName: form.clientName,
+        clientEmail: form.clientEmail,
+        status: 'pending',
+        senderAddress: {
+            street: form.senderStreet,
+            city: form.senderCity,
+            postCode: form.senderPostCode,
+            country: form.senderCountry,
+        },
+        clientAddress: {
+            street: form.clientStreet,
+            city: form.clientCity,
+            postCode: form.clientPostCode,
+            country: form.clientCountry,
+        },
+        items: items.map(({ name, quantity, price }) => ({
+            name,
+            quantity: Number(quantity),
+            price: Number(price),
+            total: Number(quantity) * Number(price),
+        })),
+        total: items.reduce((sum, item) =>
+            sum + Number(item.quantity) * Number(item.price), 0),
     }
+
+    onSave(invoice)
+}
+
+
 
     function handleDraft() {
         onClose()

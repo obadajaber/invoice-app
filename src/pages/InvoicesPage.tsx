@@ -1,19 +1,27 @@
+
 import { useState } from 'react'
 import Header from '../components/Header'
 import EmptyState from '../components/EmptyState'
 import InvoiceCard from '../components/InvoiceCard'
 import InvoiceForm from '../components/InvoiceForm'
 import { invoices } from '../data/invoices'
-import type { InvoiceStatus } from '../types/invoice'
+import type { Invoice, InvoiceStatus } from '../types/invoice'
 
 export default function InvoicesPage() {
     const [filters, setFilters] = useState<InvoiceStatus[]>([])
     const [showForm, setShowForm] = useState(false)
 
+    const [invoiceList, setInvoiceList] = useState<Invoice[]>(invoices)
+
+    function handleAddInvoice(newInvoice: Invoice) {
+        setInvoiceList((prev) => [newInvoice, ...prev])
+        setShowForm(false)
+    }
+
     const visible =
         filters.length === 0
-            ? invoices
-            : invoices.filter((inv) => filters.includes(inv.status))
+            ? invoiceList
+            : invoiceList.filter((inv) => filters.includes(inv.status))
 
     return (
         <>
@@ -34,7 +42,12 @@ export default function InvoicesPage() {
                 </div>
             )}
 
-            {showForm && <InvoiceForm onClose={() => setShowForm(false)} />}
+            {showForm && (
+                <InvoiceForm
+                    onClose={() => setShowForm(false)}
+                    onSave={handleAddInvoice}
+                />
+            )}
         </>
     )
 }

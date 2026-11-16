@@ -11,7 +11,7 @@ export default function App() {
 
     <div className="min-h-screen pl-25.75 bg-page dark:bg-dark-bg">
       <Sidebar theme={theme} onToggleTheme={toggleTheme} />
-      <main className="mx-auto w-full max-w-182.5 px-6 py-16">
+      <main className="mx-auto w-full max-w-182.5 px-6 py-16 pl-31.75">
         <Routes>
           <Route path="/" element={<InvoicesPage />} />
           <Route path="/invoices/:id" element={<InvoiceDetailPage />} />
