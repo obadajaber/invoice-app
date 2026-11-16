@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import FormField from "./FormField";
 import type { Invoice } from "../types/invoice";
 
@@ -10,24 +10,77 @@ type Props = {
   onClose: () => void;
   onSave: (invoice: Invoice) => void;
 };
+
+type FormData = {
+  senderStreet: string;
+  senderCity: string;
+  senderPostCode: string;
+  senderCountry: string;
+  clientName: string;
+  clientEmail: string;
+  clientStreet: string;
+  clientCity: string;
+  clientPostCode: string;
+  clientCountry: string;
+  invoiceDate: string;
+  paymentTerms: string;
+  description: string;
+};
+
 export default function InvoiceForm({ onClose, onSave }: Props) {
-  const [form, setForm] = useState({
-    senderStreet: "",
-    senderCity: "",
-    senderPostCode: "",
-    senderCountry: "",
-    clientName: "",
-    clientEmail: "",
-    clientStreet: "",
-    clientCity: "",
-    clientPostCode: "",
-    clientCountry: "",
-    invoiceDate: "",
-    paymentTerms: "30",
-    description: "",
+  const [form, setForm] = useState<FormData>(() => {
+    try {
+      const saved = localStorage.getItem("invoiceFormData");
+
+      return saved
+        ? JSON.parse(saved)
+        : {
+            senderStreet: "",
+            senderCity: "",
+            senderPostCode: "",
+            senderCountry: "",
+            clientName: "",
+            clientEmail: "",
+            clientStreet: "",
+            clientCity: "",
+            clientPostCode: "",
+            clientCountry: "",
+            invoiceDate: "",
+            paymentTerms: "30",
+            description: "",
+          };
+    } catch {
+      return {
+        senderStreet: "",
+        senderCity: "",
+        senderPostCode: "",
+        senderCountry: "",
+        clientName: "",
+        clientEmail: "",
+        clientStreet: "",
+        clientCity: "",
+        clientPostCode: "",
+        clientCountry: "",
+        invoiceDate: "",
+        paymentTerms: "30",
+        description: "",
+      };
+    }
   });
-  const [items, setItems] = useState<Item[]>([{ ...emptyItem }]);
+  const [items, setItems] = useState<Item[]>(() => {
+    try {
+      const saved = localStorage.getItem("invoiceItemsData");
+      return saved ? JSON.parse(saved) : [{ ...emptyItem }];
+    } catch {
+      return [{ ...emptyItem }];
+    }
+  });
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    localStorage.setItem("invoiceFormData", JSON.stringify(form));
+    localStorage.setItem("invoiceItemsData", JSON.stringify(items));
+  }, [form, items]);
 
   function set(key: keyof typeof form) {
     return (value: string) => setForm((f) => ({ ...f, [key]: value }));
@@ -110,6 +163,9 @@ export default function InvoiceForm({ onClose, onSave }: Props) {
         0,
       ),
     };
+
+    localStorage.removeItem("invoiceFormData");
+    localStorage.removeItem("invoiceItemsData");
 
     onSave(invoice);
   }

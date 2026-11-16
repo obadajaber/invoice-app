@@ -8,7 +8,13 @@ import type { Invoice, InvoiceStatus } from "../types/invoice";
 
 export default function InvoicesPage() {
   const [filters, setFilters] = useState<InvoiceStatus[]>([]);
-  const [showForm, setShowForm] = useState(false);
+  const [showForm, setShowForm] = useState(() => {
+    return localStorage.getItem("showInvoiceForm") === "true";
+  });
+
+  useEffect(() => {
+    localStorage.setItem("showInvoiceForm", String(showForm));
+  }, [showForm]);
 
   const [invoiceList, setInvoiceList] = useState<Invoice[]>(() => {
     const savedInvoices = localStorage.getItem("invoices");
@@ -17,8 +23,8 @@ export default function InvoicesPage() {
   });
 
   useEffect(() => {
-      localStorage.setItem("invoices", JSON.stringify(invoiceList));
-    }, [invoiceList]);
+    localStorage.setItem("invoices", JSON.stringify(invoiceList));
+  }, [invoiceList]);
 
   function handleAddInvoice(newInvoice: Invoice) {
     setInvoiceList((prev) => [newInvoice, ...prev]);
