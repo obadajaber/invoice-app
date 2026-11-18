@@ -9,7 +9,7 @@ export default function App() {
 
   return (
 
-    <div className="min-h-screen pl-25.75 bg-page dark:bg-dark-bg">
+    <div className="min-h-screen bg-page dark:bg-dark-bg">
       <Sidebar theme={theme} onToggleTheme={toggleTheme} />
       <main className="mx-auto w-full max-w-182.5 px-6 py-16 pl-31.75">
         <Routes>

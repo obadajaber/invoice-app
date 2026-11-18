@@ -27,6 +27,7 @@ function load(): Invoice[] {
   return seed;
 }
 
+
 export function InvoiceProvider({ children }: { children: ReactNode }) {
   const [invoices, setInvoices] = useState<Invoice[]>(load);
 
