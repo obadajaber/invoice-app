@@ -9,6 +9,7 @@ const emptyItem: Item = { name: "", quantity: "1", price: "" };
 type Props = {
   onClose: () => void;
   onSave: (invoice: Invoice) => void;
+  invoice?: Invoice;
 };
 
 type FormData = {
@@ -27,62 +28,95 @@ type FormData = {
   description: string;
 };
 
-export default function InvoiceForm({ onClose, onSave }: Props) {
-  const [form, setForm] = useState<FormData>(() => {
-    try {
-      const saved = localStorage.getItem("invoiceFormData");
+const emptyForm: FormData = {
+  senderStreet: "",
+  senderCity: "",
+  senderPostCode: "",
+  senderCountry: "",
+  clientName: "",
+  clientEmail: "",
+  clientStreet: "",
+  clientCity: "",
+  clientPostCode: "",
+  clientCountry: "",
+  invoiceDate: "",
+  paymentTerms: "30",
+  description: "",
+};
 
-      return saved
-        ? JSON.parse(saved)
-        : {
-            senderStreet: "",
-            senderCity: "",
-            senderPostCode: "",
-            senderCountry: "",
-            clientName: "",
-            clientEmail: "",
-            clientStreet: "",
-            clientCity: "",
-            clientPostCode: "",
-            clientCountry: "",
-            invoiceDate: "",
-            paymentTerms: "30",
-            description: "",
-          };
-    } catch {
+function genId() {
+  const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  const r = () => letters[Math.floor(Math.random() * 26)];
+  return `${r()}${r()}${Math.floor(1000 + Math.random() * 9000)}`;
+}
+
+function readDraft<T>(key: string, fallback: T): T {
+  try {
+    const saved = localStorage.getItem(key);
+    return saved ? (JSON.parse(saved) as T) : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+export default function InvoiceForm({ onClose, onSave, invoice }: Props) {
+  const isEdit = Boolean(invoice);
+
+  const [form, setForm] = useState<FormData>(() => {
+    if (invoice) {
       return {
-        senderStreet: "",
-        senderCity: "",
-        senderPostCode: "",
-        senderCountry: "",
-        clientName: "",
-        clientEmail: "",
-        clientStreet: "",
-        clientCity: "",
-        clientPostCode: "",
-        clientCountry: "",
-        invoiceDate: "",
-        paymentTerms: "30",
-        description: "",
+        senderStreet: invoice.senderAddress.street,
+        senderCity: invoice.senderAddress.city,
+        senderPostCode: invoice.senderAddress.postCode,
+        senderCountry: invoice.senderAddress.country,
+        clientName: invoice.clientName,
+        clientEmail: invoice.clientEmail,
+        clientStreet: invoice.clientAddress.street,
+        clientCity: invoice.clientAddress.city,
+        clientPostCode: invoice.clientAddress.postCode,
+        clientCountry: invoice.clientAddress.country,
+        invoiceDate: invoice.createdAt.slice(0, 10),
+        paymentTerms: String(invoice.paymentTerms),
+        description: invoice.description,
       };
     }
+    return readDraft<FormData>("invoiceFormData", emptyForm);
   });
+
   const [items, setItems] = useState<Item[]>(() => {
-    try {
-      const saved = localStorage.getItem("invoiceItemsData");
-      return saved ? JSON.parse(saved) : [{ ...emptyItem }];
-    } catch {
-      return [{ ...emptyItem }];
+    if (invoice) {
+      return invoice.items.map((i) => ({
+        name: i.name,
+        quantity: String(i.quantity),
+        price: String(i.price),
+      }));
     }
+    return readDraft<Item[]>("invoiceItemsData", [{ ...emptyItem }]);
   });
+
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  // حفظ مسودة الفورم فقط عند الإنشاء (ليس عند التعديل)
   useEffect(() => {
-    localStorage.setItem("invoiceFormData", JSON.stringify(form));
-    localStorage.setItem("invoiceItemsData", JSON.stringify(items));
-  }, [form, items]);
+    if (isEdit) return;
+    try {
+      localStorage.setItem("invoiceFormData", JSON.stringify(form));
+      localStorage.setItem("invoiceItemsData", JSON.stringify(items));
+    } catch {
+      // تجاهل
+    }
+  }, [form, items, isEdit]);
 
-  function set(key: keyof typeof form) {
+  function clearDraft() {
+    try {
+      localStorage.removeItem("invoiceFormData");
+      localStorage.removeItem("invoiceItemsData");
+    } catch {
+      // تجاهل
+    }
+  }
+
+  function set(key: keyof FormData) {
     return (value: string) => setForm((f) => ({ ...f, [key]: value }));
   }
 
@@ -94,7 +128,7 @@ export default function InvoiceForm({ onClose, onSave }: Props) {
 
   function validate() {
     const e: Record<string, string> = {};
-    const required: (keyof typeof form)[] = [
+    const required: (keyof FormData)[] = [
       "senderStreet",
       "senderCity",
       "senderPostCode",
@@ -124,22 +158,27 @@ export default function InvoiceForm({ onClose, onSave }: Props) {
     return Object.keys(e).length === 0;
   }
 
-  function handleSend() {
-    if (!validate()) return;
-
-    const date = new Date(form.invoiceDate);
-    const due = new Date(date);
+  function build(status: Invoice["status"]): Invoice {
+    const created = form.invoiceDate || new Date().toISOString().slice(0, 10);
+    const due = new Date(created);
     due.setDate(due.getDate() + Number(form.paymentTerms));
 
-    const invoice: Invoice = {
-      id: `INV-${Date.now()}`,
-      createdAt: date.toISOString(),
-      paymentDue: due.toISOString().split("T")[0],
+    const mapped = items.map(({ name, quantity, price }) => ({
+      name,
+      quantity: Number(quantity) || 0,
+      price: Number(price) || 0,
+      total: (Number(quantity) || 0) * (Number(price) || 0),
+    }));
+
+    return {
+      id: invoice?.id ?? genId(),
+      createdAt: created,
+      paymentDue: due.toISOString().slice(0, 10),
       description: form.description,
       paymentTerms: Number(form.paymentTerms),
       clientName: form.clientName,
       clientEmail: form.clientEmail,
-      status: "pending",
+      status,
       senderAddress: {
         street: form.senderStreet,
         city: form.senderCity,
@@ -152,25 +191,22 @@ export default function InvoiceForm({ onClose, onSave }: Props) {
         postCode: form.clientPostCode,
         country: form.clientCountry,
       },
-      items: items.map(({ name, quantity, price }) => ({
-        name,
-        quantity: Number(quantity),
-        price: Number(price),
-        total: Number(quantity) * Number(price),
-      })),
-      total: items.reduce(
-        (sum, item) => sum + Number(item.quantity) * Number(item.price),
-        0,
-      ),
+      items: mapped,
+      total: mapped.reduce((sum, i) => sum + i.total, 0),
     };
+  }
 
-    localStorage.removeItem("invoiceFormData");
-    localStorage.removeItem("invoiceItemsData");
-
-    onSave(invoice);
+  function handleSend() {
+    if (!validate()) return;
+    // فاتورة جديدة أو مسودة تُحفظ كـ pending، وغيرها تبقى حالتها
+    const status =
+      invoice && invoice.status !== "draft" ? invoice.status : "pending";
+    clearDraft();
+    onSave(build(status));
   }
 
   function handleDraft() {
+    clearDraft();
     onClose();
   }
 
@@ -179,13 +215,20 @@ export default function InvoiceForm({ onClose, onSave }: Props) {
       <aside
         role="dialog"
         aria-modal="true"
-        aria-label="New invoice"
+        aria-label={isEdit ? "Edit invoice" : "New invoice"}
         onClick={(e) => e.stopPropagation()}
         className="absolute inset-y-0 left-25.75 flex w-154 flex-col rounded-r-[20px] bg-white dark:bg-dark-bg"
       >
         <div className="flex-1 overflow-y-auto p-14">
           <h2 className="text-[24px] leading-8 font-bold tracking-[-0.5px] dark:text-white">
-            New Invoice
+            {invoice ? (
+              <>
+                Edit <span className="text-muted-2">#</span>
+                {invoice.id}
+              </>
+            ) : (
+              "New Invoice"
+            )}
           </h2>
 
           <h3 className="mt-12 font-bold text-primary">Bill From</h3>
@@ -372,29 +415,53 @@ export default function InvoiceForm({ onClose, onSave }: Props) {
         </div>
 
         <div className="flex items-center justify-between rounded-r-[20px] bg-white px-14 py-8 shadow-[0_-40px_40px_rgba(0,0,0,0.05)] dark:bg-dark-bg">
-          <button
-            type="button"
-            onClick={onClose}
-            className="h-12 rounded-full bg-[#F9FAFE] px-6 font-bold text-muted-2 hover:bg-light-1 dark:bg-dark-2 dark:text-light-1"
-          >
-            Discard
-          </button>
-          <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={handleDraft}
-              className="h-12 rounded-full bg-sidebar px-6 font-bold text-muted hover:bg-ink"
-            >
-              Save as Draft
-            </button>
-            <button
-              type="button"
-              onClick={handleSend}
-              className="h-12 rounded-full bg-primary px-6 font-bold text-white hover:bg-primary-light"
-            >
-              Save &amp; Send
-            </button>
-          </div>
+          {isEdit ? (
+            <>
+              <span />
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="h-12 rounded-full bg-[#F9FAFE] px-6 font-bold text-muted-2 hover:bg-light-1 dark:bg-dark-2 dark:text-light-1"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSend}
+                  className="h-12 rounded-full bg-primary px-6 font-bold text-white hover:bg-primary-light"
+                >
+                  Save Changes
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              <button
+                type="button"
+                onClick={onClose}
+                className="h-12 rounded-full bg-[#F9FAFE] px-6 font-bold text-muted-2 hover:bg-light-1 dark:bg-dark-2 dark:text-light-1"
+              >
+                Discard
+              </button>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={handleDraft}
+                  className="h-12 rounded-full bg-sidebar px-6 font-bold text-muted hover:bg-ink"
+                >
+                  Save as Draft
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSend}
+                  className="h-12 rounded-full bg-primary px-6 font-bold text-white hover:bg-primary-light"
+                >
+                  Save &amp; Send
+                </button>
+              </div>
+            </>
+          )}
         </div>
       </aside>
     </div>

@@ -1,40 +1,25 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Header from "../components/Header";
 import EmptyState from "../components/EmptyState";
 import InvoiceCard from "../components/InvoiceCard";
 import InvoiceForm from "../components/InvoiceForm";
-import { invoices } from "../data/invoices";
+import { useInvoices } from "../context/InvoiceContext";
 import type { Invoice, InvoiceStatus } from "../types/invoice";
 
 export default function InvoicesPage() {
+  const { invoices, addInvoice } = useInvoices();
   const [filters, setFilters] = useState<InvoiceStatus[]>([]);
-  const [showForm, setShowForm] = useState(() => {
-    return localStorage.getItem("showInvoiceForm") === "true";
-  });
-
-  useEffect(() => {
-    localStorage.setItem("showInvoiceForm", String(showForm));
-  }, [showForm]);
-
-  const [invoiceList, setInvoiceList] = useState<Invoice[]>(() => {
-    const savedInvoices = localStorage.getItem("invoices");
-
-    return savedInvoices ? JSON.parse(savedInvoices) : invoices;
-  });
-
-  useEffect(() => {
-    localStorage.setItem("invoices", JSON.stringify(invoiceList));
-  }, [invoiceList]);
+  const [showForm, setShowForm] = useState(false);
 
   function handleAddInvoice(newInvoice: Invoice) {
-    setInvoiceList((prev) => [newInvoice, ...prev]);
+    addInvoice(newInvoice);
     setShowForm(false);
   }
 
   const visible =
     filters.length === 0
-      ? invoiceList
-      : invoiceList.filter((inv) => filters.includes(inv.status));
+      ? invoices
+      : invoices.filter((inv) => filters.includes(inv.status));
 
   return (
     <>
