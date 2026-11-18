@@ -44,11 +44,8 @@ const emptyForm: FormData = {
   description: "",
 };
 
-function genId() {
-  const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  const r = () => letters[Math.floor(Math.random() * 26)];
-  return `${r()}${r()}${Math.floor(1000 + Math.random() * 9000)}`;
-}
+const DRAFT_FORM_KEY = "invoiceFormData";
+const DRAFT_ITEMS_KEY = "invoiceItemsData";
 
 function readDraft<T>(key: string, fallback: T): T {
   try {
@@ -57,6 +54,19 @@ function readDraft<T>(key: string, fallback: T): T {
   } catch {
     return fallback;
   }
+}
+
+function clearDraft() {
+  try {
+    localStorage.removeItem(DRAFT_FORM_KEY);
+    localStorage.removeItem(DRAFT_ITEMS_KEY);
+  } catch {}
+}
+
+function genId() {
+  const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  const r = () => letters[Math.floor(Math.random() * 26)];
+  return `${r()}${r()}${Math.floor(1000 + Math.random() * 9000)}`;
 }
 
 export default function InvoiceForm({ onClose, onSave, invoice }: Props) {
@@ -80,7 +90,7 @@ export default function InvoiceForm({ onClose, onSave, invoice }: Props) {
         description: invoice.description,
       };
     }
-    return readDraft<FormData>("invoiceFormData", emptyForm);
+    return readDraft<FormData>(DRAFT_FORM_KEY, emptyForm);
   });
 
   const [items, setItems] = useState<Item[]>(() => {
@@ -91,30 +101,18 @@ export default function InvoiceForm({ onClose, onSave, invoice }: Props) {
         price: String(i.price),
       }));
     }
-    return readDraft<Item[]>("invoiceItemsData", [{ ...emptyItem }]);
+    return readDraft<Item[]>(DRAFT_ITEMS_KEY, [{ ...emptyItem }]);
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  // حفظ مسودة الفورم فقط عند الإنشاء (ليس عند التعديل)
   useEffect(() => {
     if (isEdit) return;
     try {
-      localStorage.setItem("invoiceFormData", JSON.stringify(form));
-      localStorage.setItem("invoiceItemsData", JSON.stringify(items));
-    } catch {
-      // تجاهل
-    }
+      localStorage.setItem(DRAFT_FORM_KEY, JSON.stringify(form));
+      localStorage.setItem(DRAFT_ITEMS_KEY, JSON.stringify(items));
+    } catch {}
   }, [form, items, isEdit]);
-
-  function clearDraft() {
-    try {
-      localStorage.removeItem("invoiceFormData");
-      localStorage.removeItem("invoiceItemsData");
-    } catch {
-      // تجاهل
-    }
-  }
 
   function set(key: keyof FormData) {
     return (value: string) => setForm((f) => ({ ...f, [key]: value }));
@@ -196,9 +194,13 @@ export default function InvoiceForm({ onClose, onSave, invoice }: Props) {
     };
   }
 
+  function handleDiscard() {
+    clearDraft();
+    onClose();
+  }
+
   function handleSend() {
     if (!validate()) return;
-    // فاتورة جديدة أو مسودة تُحفظ كـ pending، وغيرها تبقى حالتها
     const status =
       invoice && invoice.status !== "draft" ? invoice.status : "pending";
     clearDraft();
@@ -207,7 +209,7 @@ export default function InvoiceForm({ onClose, onSave, invoice }: Props) {
 
   function handleDraft() {
     clearDraft();
-    onClose();
+    onSave(build("draft"));
   }
 
   return (
@@ -439,7 +441,7 @@ export default function InvoiceForm({ onClose, onSave, invoice }: Props) {
             <>
               <button
                 type="button"
-                onClick={onClose}
+                onClick={handleDiscard}
                 className="h-12 rounded-full bg-[#F9FAFE] px-6 font-bold text-muted-2 hover:bg-light-1 dark:bg-dark-2 dark:text-light-1"
               >
                 Discard

@@ -23,9 +23,7 @@ function load(): Invoice[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) return JSON.parse(raw) as Invoice[];
-  } catch {
-    // تجاهل: نستخدم البيانات التجريبية
-  }
+  } catch {}
   return seed;
 }
 
@@ -35,9 +33,7 @@ export function InvoiceProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(invoices));
-    } catch {
-      // تجاهل
-    }
+    } catch {}
   }, [invoices]);
 
   const value: InvoiceContextType = {
