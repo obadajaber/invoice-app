@@ -106,7 +106,7 @@ export default function InvoiceForm({ onClose, onSave, invoice }: Props) {
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  
+
   useEffect(() => {
     if (isEdit) return;
     try {
