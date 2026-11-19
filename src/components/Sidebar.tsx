@@ -7,19 +7,19 @@ type Props = { theme: "light" | "dark"; onToggleTheme: () => void };
 
 export default function Sidebar({ theme, onToggleTheme }: Props) {
   return (
-    <aside className="fixed inset-y-0 left-0 z-30 flex w-25.75 flex-col rounded-r-[20px] bg-sidebar dark:bg-dark-1">
+    <aside className="fixed top-0 left-0 right-0 z-30 flex h-18 w-full flex-row bg-sidebar dark:bg-dark-1 md:h-20 lg:inset-y-0 lg:right-auto lg:h-auto lg:w-25.75 lg:flex-col lg:rounded-r-[20px]">
       {/* القسم العلوي : المربع البنفسجي الي ورا الشعار*/}
-      <div className="flex h-25.75 items-center justify-center rounded-br-[20px] bg-primary">
-        <img src={logo} alt="Invoice app logo" className="h-10 w-10" />
+      <div className="flex h-18 w-18 shrink-0 items-center justify-center rounded-br-[20px] bg-primary md:h-20 md:w-20 lg:h-25.75 lg:w-full">
+        <img src={logo} alt="Invoice app logo" className="h-8 w-8 lg:h-10 lg:w-10" />
       </div>
 
       {/* القسم السفلي : القمر/الشمس و الصورة والفاصل */}
-      <div className="mt-auto flex flex-col items-center">
+      <div className="ml-auto flex flex-row items-center lg:ml-0 lg:mt-auto lg:flex-col">
         <button
           type="button"
           aria-label="Toggle theme"
           onClick={onToggleTheme}
-          className="p-8"
+          className="p-4 lg:p-8"
         >
           {theme === "dark" ? (
             <img src={sun} alt="" className="h-5 w-5" />
@@ -28,7 +28,7 @@ export default function Sidebar({ theme, onToggleTheme }: Props) {
           )}
         </button>
 
-        <div className="flex w-full justify-center border-t border-[#494E6E] p-6">
+        <div className="flex justify-center border-l border-[#494E6E] p-4 lg:w-full lg:border-l-0 lg:border-t lg:p-6">
           <img
             src={avatar}
             alt="User avatar"
