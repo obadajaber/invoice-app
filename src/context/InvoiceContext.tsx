@@ -1,32 +1,19 @@
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  type ReactNode,
-} from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import type { Invoice } from "../types/invoice";
 import { invoices as seed } from "../data/invoices";
+import { InvoiceContext, type InvoiceContextType } from "./invoiceContextValue";
 
-type InvoiceContextType = {
-  invoices: Invoice[];
-  addInvoice: (invoice: Invoice) => void;
-  updateInvoice: (invoice: Invoice) => void;
-  deleteInvoice: (id: string) => void;
-  markPaid: (id: string) => void;
-};
-
-const InvoiceContext = createContext<InvoiceContextType | null>(null);
 const STORAGE_KEY = "invoices";
 
 function load(): Invoice[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) return JSON.parse(raw) as Invoice[];
-  } catch {}
+  } catch (error) {
+    console.warn("Could not read invoices", error);
+  }
   return seed;
 }
-
 
 export function InvoiceProvider({ children }: { children: ReactNode }) {
   const [invoices, setInvoices] = useState<Invoice[]>(load);
@@ -34,7 +21,9 @@ export function InvoiceProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(invoices));
-    } catch {}
+    } catch (error) {
+      console.warn("Could not save invoices", error);
+    }
   }, [invoices]);
 
   const value: InvoiceContextType = {
@@ -55,10 +44,4 @@ export function InvoiceProvider({ children }: { children: ReactNode }) {
   return (
     <InvoiceContext.Provider value={value}>{children}</InvoiceContext.Provider>
   );
-}
-
-export function useInvoices() {
-  const ctx = useContext(InvoiceContext);
-  if (!ctx) throw new Error("useInvoices must be used inside InvoiceProvider");
-  return ctx;
 }

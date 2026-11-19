@@ -3,7 +3,7 @@ import Header from "../components/Header";
 import EmptyState from "../components/EmptyState";
 import InvoiceCard from "../components/InvoiceCard";
 import InvoiceForm from "../components/InvoiceForm";
-import { useInvoices } from "../context/InvoiceContext";
+import { useInvoices } from "../context/useInvoices";
 import type { Invoice, InvoiceStatus } from "../types/invoice";
 
 export default function InvoicesPage() {

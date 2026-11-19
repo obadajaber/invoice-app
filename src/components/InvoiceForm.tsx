@@ -60,7 +60,9 @@ function clearDraft() {
   try {
     localStorage.removeItem(DRAFT_FORM_KEY);
     localStorage.removeItem(DRAFT_ITEMS_KEY);
-  } catch {}
+  } catch (error){
+    console.warn("Could not clear the draft", error);
+  }
 }
 
 function genId() {
@@ -112,7 +114,9 @@ export default function InvoiceForm({ onClose, onSave, invoice }: Props) {
     try {
       localStorage.setItem(DRAFT_FORM_KEY, JSON.stringify(form));
       localStorage.setItem(DRAFT_ITEMS_KEY, JSON.stringify(items));
-    } catch {}
+    } catch(error) {
+      console.warn("Could not save the draft", error);
+    }
   }, [form, items, isEdit]);
 
   function set(key: keyof FormData) {

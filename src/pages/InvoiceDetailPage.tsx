@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
-import { useInvoices } from "../context/InvoiceContext";
+import { useInvoices } from "../context/useInvoices";
 import InvoiceActions from "../components/InvoiceActions";
 import InvoiceInfo from "../components/InvoiceInfo";
 import InvoiceItemsTable from "../components/InvoiceItemsTable";

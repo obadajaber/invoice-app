@@ -6,8 +6,8 @@ function getInitialTheme(): Theme {
     try {
         const saved = localStorage.getItem('theme')
         if (saved === 'dark' || saved === 'light') return saved
-    } catch {
-
+    } catch (error){
+        console.warn('Could not read theme', error)
     }
     return 'light'
 }
@@ -19,8 +19,8 @@ export function useTheme() {
         document.documentElement.classList.toggle('dark', theme === 'dark')
         try {
             localStorage.setItem('theme', theme)
-        } catch {
-           
+        } catch (error) {
+           console.warn('Could not save theme', error)
         }
     }, [theme])
 
