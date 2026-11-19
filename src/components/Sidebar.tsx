@@ -1,6 +1,6 @@
 import logo from "../assets/logo.svg";
 import moon from "../assets/icon-moon.svg";
-import avatar from "../assets/avatar.png";
+import avatar from "../assets/avatar.jpg";
 import sun from "../assets/icon-sun.svg";
 
 type Props = { theme: "light" | "dark"; onToggleTheme: () => void };
