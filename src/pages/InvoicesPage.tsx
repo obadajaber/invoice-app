@@ -31,7 +31,9 @@ export default function InvoicesPage() {
       />
 
       {visible.length === 0 ? (
-        <EmptyState />
+        <div className="-mb-16 lg:-mb-32">
+          <EmptyState />
+        </div>
       ) : (
         <div className="mt-8 flex flex-col gap-4 md:mt-16">
           {visible.map((invoice) => (

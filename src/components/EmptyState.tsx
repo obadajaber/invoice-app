@@ -2,7 +2,7 @@ import illustration from "../assets/empty-illustration.svg";
 
 export default function EmptyState() {
   return (
-    <section className="mt-25.5 flex flex-col items-center text-center md:mt-54">
+    <section className='mt-25.5 flex flex-col items-center text-center md:mt-54 lg:mt-35'>
       <img
         src={illustration}
         alt="illustration of a person"
