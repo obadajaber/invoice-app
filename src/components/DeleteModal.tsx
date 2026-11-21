@@ -23,7 +23,7 @@ export default function DeleteModal({ invoiceId, onCancel, onConfirm }: Props) {
         role="dialog"
         aria-modal="true"
         aria-labelledby="delete-title"
-        className="w-full max-w-120 rounded-lg bg-white p-12 shadow-xl dark:bg-dark-1"
+        className="w-full max-w-120 rounded-lg bg-white p-8 shadow-xl md:p-12 dark:bg-dark-1"
         onClick={(e) => e.stopPropagation()}
       >
         <h2
@@ -33,12 +33,12 @@ export default function DeleteModal({ invoiceId, onCancel, onConfirm }: Props) {
           Confirm Deletion
         </h2>
 
-        <p className="mt-3 text-muted-2">
+        <p className="mt-2 text-muted-2 md:mt-3">
           Are you sure you want to delete invoice #{invoiceId}? This action
           cannot be undone.
         </p>
 
-        <div className="mt-4 flex justify-end gap-2">
+        <div className="mt-3 flex justify-end gap-2 md:mt-4">
           <button
             type="button"
             onClick={onCancel}
