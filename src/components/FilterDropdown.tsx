@@ -1,37 +1,48 @@
-import { useState } from 'react'
-import type { InvoiceStatus } from '../types/invoice'
-import arrowDown from '../assets/icon-arrow-down.svg'
+import { useState, useEffect, useRef } from "react";
+import type { InvoiceStatus } from "../types/invoice";
+import arrowDown from "../assets/icon-arrow-down.svg";
 
-const options: InvoiceStatus[] = ['draft', 'pending', 'paid']
+const options: InvoiceStatus[] = ["draft", "pending", "paid"];
 
 type Props = {
-  selected: InvoiceStatus[]
-  onChange: (selected: InvoiceStatus[]) => void
-}
+  selected: InvoiceStatus[];
+  onChange: (selected: InvoiceStatus[]) => void;
+};
 
 export default function FilterDropdown({ selected, onChange }: Props) {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node))
+        setOpen(false);
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
 
   function toggle(status: InvoiceStatus) {
     if (selected.includes(status)) {
-      onChange(selected.filter((s) => s !== status))
+      onChange(selected.filter((s) => s !== status));
     } else {
-      onChange([...selected, status])
+      onChange([...selected, status]);
     }
   }
 
   return (
-    <div className="relative">
+        <div ref={ref} className="relative">
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-3.5 font-bold text-ink hover:opacity-70 dark:text-white"
+        className="flex items-center gap-3 font-bold text-ink hover:opacity-70 md:gap-3.5 dark:text-white"
       >
-        Filter by status
+        <span className="md:hidden">Filter</span>
+        <span className="hidden md:inline">Filter by status</span>
         <img
           src={arrowDown}
           alt=""
-          className={`h-1.25 w-2.25 transition-transform ${open ? 'rotate-180' : ''}`}
+          className={`h-1.25 w-2.25 transition-transform ${open ? "rotate-180" : ""}`}
         />
       </button>
 
@@ -53,5 +64,5 @@ export default function FilterDropdown({ selected, onChange }: Props) {
         </ul>
       )}
     </div>
-  )
+  );
 }

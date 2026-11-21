@@ -10,7 +10,11 @@ export default function Sidebar({ theme, onToggleTheme }: Props) {
     <aside className="fixed top-0 left-0 right-0 z-30 flex h-18 w-full flex-row bg-sidebar dark:bg-dark-1 md:h-20 lg:inset-y-0 lg:right-auto lg:h-auto lg:w-25.75 lg:flex-col lg:rounded-r-[20px]">
       {/* القسم العلوي : المربع البنفسجي الي ورا الشعار*/}
       <div className="flex h-18 w-18 shrink-0 items-center justify-center rounded-br-[20px] bg-primary md:h-20 md:w-20 lg:h-25.75 lg:w-full">
-        <img src={logo} alt="Invoice app logo" className="h-8 w-8 lg:h-10 lg:w-10" />
+        <img
+          src={logo}
+          alt="Invoice app logo"
+          className="h-6.5 w-7 md:h-7.75 md:w-7.75 lg:h-10 lg:w-10"
+        />
       </div>
 
       {/* القسم السفلي : القمر/الشمس و الصورة والفاصل */}
