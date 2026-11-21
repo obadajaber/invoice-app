@@ -28,12 +28,18 @@ export default function InvoiceDetailPage() {
   }
 
   return (
-    <div>
+    <div className="pb-20 md:-mx-2 md:-mt-3 md:pb-0 lg:mx-0 lg:mt-0">
       <Link
         to="/"
-        className="flex w-fit items-center gap-6 font-bold hover:text-muted-2 dark:text-white dark:hover:text-muted-2"
+        className="flex w-fit items-center gap-5 font-bold hover:text-muted-2 lg:gap-6 dark:text-white dark:hover:text-muted-2"
       >
-        <svg width="7" height="10" viewBox="0 0 7 10" fill="none" aria-hidden="true">
+        <svg
+          width="7"
+          height="10"
+          viewBox="0 0 7 10"
+          fill="none"
+          aria-hidden="true"
+        >
           <path d="M6 1L2 5l4 4" stroke="#7C5DFA" strokeWidth="2" />
         </svg>
         Go back
@@ -46,9 +52,9 @@ export default function InvoiceDetailPage() {
         onMarkPaid={() => markPaid(invoice.id)}
       />
 
-      <div className="mt-4 rounded-lg bg-white shadow-sm dark:bg-dark-1 dark:shadow-none">
+      <div className="mt-4 rounded-lg bg-white shadow-sm md:mt-6 lg:mt-4 dark:bg-dark-1 dark:shadow-none">
         <InvoiceInfo invoice={invoice} />
-        <div className="px-8 pb-8">
+        <div className="px-6 pb-6 md:px-8 md:pb-8">
           <InvoiceItemsTable items={invoice.items} total={invoice.total} />
         </div>
       </div>
