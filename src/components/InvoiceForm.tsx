@@ -457,7 +457,7 @@ export default function InvoiceForm({ onClose, onSave, invoice }: Props) {
                 <button
                   type="button"
                   onClick={onClose}
-                  className="h-12 rounded-full bg-[#F9FAFE] px-[26px] font-bold text-muted-2 hover:bg-light-1 md:px-6 dark:bg-dark-2 dark:text-light-1"
+                  className="h-12 rounded-full bg-[#F9FAFE] px-6.5 font-bold text-muted-2 hover:bg-light-1 md:px-6 dark:bg-dark-2 dark:text-light-1"
                 >
                   Cancel
                 </button>
