@@ -4,13 +4,18 @@ import { BrowserRouter } from "react-router";
 import "./index.css";
 import App from "./App";
 import { InvoiceProvider } from "./context/InvoiceContext";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+const queryClient = new QueryClient();
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <BrowserRouter>
-     <InvoiceProvider>
-      <App />
-      </InvoiceProvider>
-    </BrowserRouter>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <InvoiceProvider>
+          <App />
+        </InvoiceProvider>
+      </BrowserRouter>
+    </QueryClientProvider>
   </StrictMode>,
 );
