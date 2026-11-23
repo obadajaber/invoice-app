@@ -12,6 +12,7 @@ export function useInvoicesQuery() {
   return useQuery({
     queryKey: ["invoices"],
     queryFn: getInvoices,
+    retry: 1,
   });
 }
 
@@ -20,6 +21,7 @@ export function useInvoiceQuery(id: string | undefined) {
     queryKey: ["invoices", id],
     queryFn: () => getInvoice(id!),
     enabled: Boolean(id),
+    retry: 1,
   });
 }
 

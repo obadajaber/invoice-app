@@ -3,11 +3,19 @@ import Header from "../components/Header";
 import EmptyState from "../components/EmptyState";
 import InvoiceCard from "../components/InvoiceCard";
 import InvoiceForm from "../components/InvoiceForm";
+import Loader from "../components/Loader";
+import ErrorState from "../components/ErrorState";
 import { useInvoicesQuery, useCreateInvoice } from "../hooks/useInvoicesApi";
 import type { Invoice, InvoiceStatus } from "../types/invoice";
 
 export default function InvoicesPage() {
-  const { data: invoices = [] } = useInvoicesQuery();
+  const {
+    data: invoices = [],
+    isPending,
+    isError,
+    refetch,
+    isRefetching,
+  } = useInvoicesQuery();
   const createInvoice = useCreateInvoice();
   const [filters, setFilters] = useState<InvoiceStatus[]>([]);
   const [showForm, setShowForm] = useState(false);
@@ -35,7 +43,15 @@ export default function InvoicesPage() {
         onNew={() => setShowForm(true)}
       />
 
-      {visible.length === 0 ? (
+      {isPending ? (
+        <Loader label="Loading invoices…" />
+      ) : isError ? (
+        <ErrorState
+          title="Couldn't load invoices"
+          onRetry={() => refetch()}
+          isRetrying={isRefetching}
+        />
+      ) : visible.length === 0 ? (
         <div className="-mb-16 lg:-mb-32">
           <EmptyState />
         </div>

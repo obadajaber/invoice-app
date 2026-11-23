@@ -4,37 +4,54 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-    --font-sans: "League Spartan", sans-serif;
+  --font-sans: "League Spartan", sans-serif;
 
-    --color-primary: #7c5dfa;
-    --color-primary-light: #9277ff;
-    --color-sidebar: #373b53;
-    --color-page: #f8f8fb;
-    --color-ink: #0c0e16;
-    --color-muted: #888eb0;
-    --color-muted-2: #7e88c3;
-    --color-light-1: #dfe3fa;
-    --color-danger: #ec5757;
-    --color-danger-light: #ff9797;
-    --color-dark-1: #1e2139;
-    --color-dark-2: #252945;
-    --color-dark-bg: #141625;
-    --color-dark-sidebar: #1e2139;
+  --color-primary: #7c5dfa;
+  --color-primary-light: #9277ff;
+  --color-sidebar: #373b53;
+  --color-page: #f8f8fb;
+  --color-ink: #0c0e16;
+  --color-muted: #888eb0;
+  --color-muted-2: #7e88c3;
+  --color-light-1: #dfe3fa;
+  --color-danger: #ec5757;
+  --color-danger-light: #ff9797;
+  --color-dark-1: #1e2139;
+  --color-dark-2: #252945;
+  --color-dark-bg: #141625;
+  --color-dark-sidebar: #1e2139;
+
+  --animate-morph: morph 2s ease-in-out infinite;
+
+  @keyframes morph {
+    0% {
+      border-radius: 6%;
+      transform: rotate(0deg);
+    }
+    50% {
+      border-radius: 50%;
+      transform: rotate(180deg);
+    }
+    100% {
+      border-radius: 6%;
+      transform: rotate(360deg);
+    }
+  }
 }
 
 body {
-    font-family: var(--font-sans);
-    font-size: 13px;
-    line-height: 18px;
-    letter-spacing: -0.1px;
-    background-color: var(--color-page);
-    color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 18px;
+  letter-spacing: -0.1px;
+  background-color: var(--color-page);
+  color: var(--color-ink);
 }
 .dark {
   color-scheme: dark;
 }
 
 .dark body {
-    background-color: var(--color-dark-bg);
-    color: #fff;
+  background-color: var(--color-dark-bg);
+  color: #fff;
 }
