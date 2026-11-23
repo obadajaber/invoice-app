@@ -81,9 +81,12 @@ export default function InvoiceDetailPage() {
         <InvoiceForm
           invoice={invoice}
           onClose={() => setShowEdit(false)}
-          onSave={(updated) => {
+          onSave={(updated, clearDraft) => {
             updateInvoice.mutate(updated, {
-              onSuccess: () => setShowEdit(false),
+              onSuccess: () => {
+                clearDraft();
+                setShowEdit(false);
+              },
             });
           }}
         />

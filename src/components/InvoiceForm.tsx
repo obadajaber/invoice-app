@@ -8,7 +8,7 @@ const emptyItem: Item = { name: "", quantity: "1", price: "" };
 
 type Props = {
   onClose: () => void;
-  onSave: (invoice: Invoice) => void;
+  onSave: (invoice: Invoice, onSuccess: () => void) => void;
   invoice?: Invoice;
 };
 
@@ -214,13 +214,11 @@ export default function InvoiceForm({ onClose, onSave, invoice }: Props) {
     if (!validate()) return;
     const status =
       invoice && invoice.status !== "draft" ? invoice.status : "pending";
-    clearDraft();
-    onSave(build(status));
+    onSave(build(status), clearDraft);
   }
 
   function handleDraft() {
-    clearDraft();
-    onSave(build("draft"));
+    onSave(build("draft"), clearDraft);
   }
 
   return (

@@ -12,9 +12,12 @@ export default function InvoicesPage() {
   const [filters, setFilters] = useState<InvoiceStatus[]>([]);
   const [showForm, setShowForm] = useState(false);
 
-  function handleAddInvoice(newInvoice: Invoice) {
+  function handleAddInvoice(newInvoice: Invoice, clearDraft: () => void) {
     createInvoice.mutate(newInvoice, {
-      onSuccess: () => setShowForm(false),
+      onSuccess: () => {
+        clearDraft();
+        setShowForm(false);
+      },
     });
   }
 
