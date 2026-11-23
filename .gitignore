@@ -25,3 +25,4 @@ dist-ssr
 *.fig
 design/
 invoice-app-figma*
+*.tsbuildinfo
