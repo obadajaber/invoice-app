@@ -3,17 +3,19 @@ import Header from "../components/Header";
 import EmptyState from "../components/EmptyState";
 import InvoiceCard from "../components/InvoiceCard";
 import InvoiceForm from "../components/InvoiceForm";
-import { useInvoices } from "../context/useInvoices";
+import { useInvoicesQuery, useCreateInvoice } from "../hooks/useInvoicesApi";
 import type { Invoice, InvoiceStatus } from "../types/invoice";
 
 export default function InvoicesPage() {
-  const { invoices, addInvoice } = useInvoices();
+  const { data: invoices = [] } = useInvoicesQuery();
+  const createInvoice = useCreateInvoice();
   const [filters, setFilters] = useState<InvoiceStatus[]>([]);
   const [showForm, setShowForm] = useState(false);
 
   function handleAddInvoice(newInvoice: Invoice) {
-    addInvoice(newInvoice);
-    setShowForm(false);
+    createInvoice.mutate(newInvoice, {
+      onSuccess: () => setShowForm(false),
+    });
   }
 
   const visible =

@@ -11,7 +11,8 @@ async function handleResponse<T>(res: Response): Promise<T> {
 
 export async function getInvoices(): Promise<Invoice[]> {
   const res = await fetch(BASE_URL);
-  return handleResponse<Invoice[]>(res);
+  const invoices = await handleResponse<Invoice[]>(res);
+  return invoices.reverse();
 }
 
 export async function getInvoice(id: string): Promise<Invoice> {

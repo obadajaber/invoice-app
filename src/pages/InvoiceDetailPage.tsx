@@ -1,6 +1,11 @@
 import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
-import { useInvoices } from "../context/useInvoices";
+import {
+  useInvoiceQuery,
+  useDeleteInvoice,
+  useMarkPaid,
+  useUpdateInvoice,
+} from "../hooks/useInvoicesApi";
 import InvoiceActions from "../components/InvoiceActions";
 import InvoiceInfo from "../components/InvoiceInfo";
 import InvoiceItemsTable from "../components/InvoiceItemsTable";
@@ -10,11 +15,12 @@ import InvoiceForm from "../components/InvoiceForm";
 export default function InvoiceDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { invoices, deleteInvoice, markPaid, updateInvoice } = useInvoices();
+  const { data: invoice } = useInvoiceQuery(id);
+  const deleteInvoice = useDeleteInvoice();
+  const markPaid = useMarkPaid();
+  const updateInvoice = useUpdateInvoice();
   const [showDelete, setShowDelete] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
-
-  const invoice = invoices.find((inv) => inv.id === id);
 
   if (!invoice) {
     return (
@@ -49,7 +55,7 @@ export default function InvoiceDetailPage() {
         status={invoice.status}
         onEdit={() => setShowEdit(true)}
         onDelete={() => setShowDelete(true)}
-        onMarkPaid={() => markPaid(invoice.id)}
+        onMarkPaid={() => markPaid.mutate(invoice.id)}
       />
 
       <div className="mt-4 rounded-lg bg-white shadow-sm md:mt-6 lg:mt-4 dark:bg-dark-1 dark:shadow-none">
@@ -64,8 +70,9 @@ export default function InvoiceDetailPage() {
           invoiceId={invoice.id}
           onCancel={() => setShowDelete(false)}
           onConfirm={() => {
-            deleteInvoice(invoice.id);
-            navigate("/");
+            deleteInvoice.mutate(invoice.id, {
+              onSuccess: () => navigate("/"),
+            });
           }}
         />
       )}
@@ -75,8 +82,9 @@ export default function InvoiceDetailPage() {
           invoice={invoice}
           onClose={() => setShowEdit(false)}
           onSave={(updated) => {
-            updateInvoice(updated);
-            setShowEdit(false);
+            updateInvoice.mutate(updated, {
+              onSuccess: () => setShowEdit(false),
+            });
           }}
         />
       )}
