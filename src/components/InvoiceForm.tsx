@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import FormField from "./FormField";
+import ErrorBanner from "./ErrorBanner";
 import type { Invoice } from "../types/invoice";
 
 type Item = { name: string; quantity: string; price: string };
@@ -10,6 +11,8 @@ type Props = {
   onClose: () => void;
   onSave: (invoice: Invoice, onSuccess: () => void) => void;
   invoice?: Invoice;
+  error?: string | null;
+  isSaving?: boolean;
 };
 
 type FormData = {
@@ -71,7 +74,13 @@ function genId() {
   return `${r()}${r()}${Math.floor(1000 + Math.random() * 9000)}`;
 }
 
-export default function InvoiceForm({ onClose, onSave, invoice }: Props) {
+export default function InvoiceForm({
+  onClose,
+  onSave,
+  invoice,
+  error,
+  isSaving = false,
+}: Props) {
   const isEdit = Boolean(invoice);
 
   const [form, setForm] = useState<FormData>(() => {
@@ -211,13 +220,14 @@ export default function InvoiceForm({ onClose, onSave, invoice }: Props) {
   }
 
   function handleSend() {
-    if (!validate()) return;
+    if (isSaving || !validate()) return;
     const status =
       invoice && invoice.status !== "draft" ? invoice.status : "pending";
     onSave(build(status), clearDraft);
   }
 
   function handleDraft() {
+    if (isSaving) return;
     onSave(build("draft"), clearDraft);
   }
 
@@ -447,6 +457,12 @@ export default function InvoiceForm({ onClose, onSave, invoice }: Props) {
           )}
         </div>
 
+        {error && (
+          <div className="bg-white px-6 pb-4 md:px-14 dark:bg-dark-bg">
+            <ErrorBanner message={error} />
+          </div>
+        )}
+
         <div className="flex h-22.75 items-center justify-between bg-white px-6 shadow-[0_-40px_40px_rgba(0,0,0,0.05)] md:h-auto md:rounded-r-[20px] md:px-14 md:py-8 dark:bg-dark-bg">
           {isEdit ? (
             <>
@@ -455,16 +471,18 @@ export default function InvoiceForm({ onClose, onSave, invoice }: Props) {
                 <button
                   type="button"
                   onClick={onClose}
-                  className="h-12 rounded-full bg-[#F9FAFE] px-6.5 font-bold text-muted-2 hover:bg-light-1 md:px-6 dark:bg-dark-2 dark:text-light-1"
+                  disabled={isSaving}
+                  className="h-12 rounded-full bg-[#F9FAFE] px-6.5 font-bold text-muted-2 hover:bg-light-1 disabled:cursor-not-allowed disabled:opacity-60 md:px-6 dark:bg-dark-2 dark:text-light-1"
                 >
                   Cancel
                 </button>
                 <button
                   type="button"
                   onClick={handleSend}
-                  className="h-12 rounded-full bg-primary px-6 font-bold text-white hover:bg-primary-light"
+                  disabled={isSaving}
+                  className="h-12 rounded-full bg-primary px-6 font-bold text-white hover:bg-primary-light disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  Save Changes
+                  {isSaving ? "Saving…" : "Save Changes"}
                 </button>
               </div>
             </>
@@ -473,7 +491,8 @@ export default function InvoiceForm({ onClose, onSave, invoice }: Props) {
               <button
                 type="button"
                 onClick={handleDiscard}
-                className="h-12 rounded-full bg-[#F9FAFE] px-4.5 font-bold text-muted-2 hover:bg-light-1 md:px-6 dark:bg-dark-2 dark:text-light-1"
+                disabled={isSaving}
+                className="h-12 rounded-full bg-[#F9FAFE] px-4.5 font-bold text-muted-2 hover:bg-light-1 disabled:cursor-not-allowed disabled:opacity-60 md:px-6 dark:bg-dark-2 dark:text-light-1"
               >
                 Discard
               </button>
@@ -481,16 +500,18 @@ export default function InvoiceForm({ onClose, onSave, invoice }: Props) {
                 <button
                   type="button"
                   onClick={handleDraft}
-                  className="h-12 rounded-full bg-sidebar px-4 font-bold text-muted hover:bg-ink md:px-6"
+                  disabled={isSaving}
+                  className="h-12 rounded-full bg-sidebar px-4 font-bold text-muted hover:bg-ink disabled:cursor-not-allowed disabled:opacity-60 md:px-6"
                 >
                   Save as Draft
                 </button>
                 <button
                   type="button"
                   onClick={handleSend}
-                  className="h-12 rounded-full bg-primary px-4 font-bold text-white hover:bg-primary-light md:px-6"
+                  disabled={isSaving}
+                  className="h-12 rounded-full bg-primary px-4 font-bold text-white hover:bg-primary-light disabled:cursor-not-allowed disabled:opacity-60 md:px-6"
                 >
-                  Save &amp; Send
+                  {isSaving ? "Saving…" : "Save & Send"}
                 </button>
               </div>
             </>

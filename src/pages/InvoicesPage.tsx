@@ -29,6 +29,11 @@ export default function InvoicesPage() {
     });
   }
 
+  function handleCloseForm() {
+    createInvoice.reset();
+    setShowForm(false);
+  }
+
   const visible =
     filters.length === 0
       ? invoices
@@ -65,8 +70,14 @@ export default function InvoicesPage() {
 
       {showForm && (
         <InvoiceForm
-          onClose={() => setShowForm(false)}
+          onClose={handleCloseForm}
           onSave={handleAddInvoice}
+          error={
+            createInvoice.isError
+              ? "Couldn't save the invoice. Please try again."
+              : null
+          }
+          isSaving={createInvoice.isPending}
         />
       )}
     </>
