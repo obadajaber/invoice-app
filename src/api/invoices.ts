@@ -2,9 +2,18 @@ import type { Invoice } from "../types/invoice";
 
 const BASE_URL = "http://localhost:3001/invoices";
 
+export class ApiError extends Error {
+  status: number;
+
+  constructor(status: number) {
+    super(`Request failed with status ${status}`);
+    this.status = status;
+  }
+}
+
 async function handleResponse<T>(res: Response): Promise<T> {
   if (!res.ok) {
-    throw new Error(`Request failed with status ${res.status}`);
+    throw new ApiError(res.status);
   }
   return res.json() as Promise<T>;
 }

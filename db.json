@@ -141,37 +141,6 @@
         }
       ],
       "total": 600
-    },
-    {
-      "id": "JO1005",
-      "createdAt": "2026-11-14",
-      "paymentDue": "2026-12-14",
-      "description": "Marketing Consultation",
-      "paymentTerms": 30,
-      "clientName": "Yousef Al-Abbadi",
-      "clientEmail": "yousef.abbadi@mail.com",
-      "status": "draft",
-      "senderAddress": {
-        "street": "University Street",
-        "city": "Amman",
-        "postCode": "11942",
-        "country": "Jordan"
-      },
-      "clientAddress": {
-        "street": "Prince Hasan Street",
-        "city": "Aqaba",
-        "postCode": "77110",
-        "country": "Jordan"
-      },
-      "items": [
-        {
-          "name": "Consultation Hours",
-          "quantity": 4,
-          "price": 75,
-          "total": 300
-        }
-      ],
-      "total": 300
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"

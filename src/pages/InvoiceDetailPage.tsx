@@ -11,24 +11,56 @@ import InvoiceInfo from "../components/InvoiceInfo";
 import InvoiceItemsTable from "../components/InvoiceItemsTable";
 import DeleteModal from "../components/DeleteModal";
 import InvoiceForm from "../components/InvoiceForm";
+import Loader from "../components/Loader";
+import ErrorState from "../components/ErrorState";
+import { ApiError } from "../api/invoices";
 
 export default function InvoiceDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { data: invoice } = useInvoiceQuery(id);
+  const {
+    data: invoice,
+    isPending,
+    isError,
+    error,
+    refetch,
+    isRefetching,
+  } = useInvoiceQuery(id);
   const deleteInvoice = useDeleteInvoice();
   const markPaid = useMarkPaid();
   const updateInvoice = useUpdateInvoice();
   const [showDelete, setShowDelete] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
-
-  if (!invoice) {
+  if (isPending) {
     return (
       <div>
         <Link to="/" className="font-bold dark:text-white">
           Go back
         </Link>
-        <p className="mt-8 dark:text-white">Invoice not found.</p>
+        <Loader label="Loading invoice…" />
+      </div>
+    );
+  }
+
+  if (isError) {
+    const notFound = error instanceof ApiError && error.status === 404;
+    return (
+      <div>
+        <Link to="/" className="font-bold dark:text-white">
+          Go back
+        </Link>
+        {notFound ? (
+          <ErrorState
+            title="Invoice not found"
+            message="This invoice doesn't exist or may have been deleted."
+          />
+        ) : (
+          <ErrorState
+            title="Couldn't load invoice"
+            onRetry={() => refetch()}
+            isRetrying={isRefetching}
+          />
+        )}
       </div>
     );
   }

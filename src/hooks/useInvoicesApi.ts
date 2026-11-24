@@ -7,6 +7,7 @@ import {
   markInvoicePaid,
   updateInvoice,
 } from "../api/invoices";
+import { ApiError } from "../api/invoices";
 
 export function useInvoicesQuery() {
   return useQuery({
@@ -21,7 +22,8 @@ export function useInvoiceQuery(id: string | undefined) {
     queryKey: ["invoices", id],
     queryFn: () => getInvoice(id!),
     enabled: Boolean(id),
-    retry: 1,
+    retry: (failureCount, error) =>
+      !(error instanceof ApiError && error.status === 404) && failureCount < 1,
   });
 }
 
