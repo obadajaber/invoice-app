@@ -42,7 +42,7 @@ export function useUpdateInvoice() {
   return useMutation({
     mutationFn: updateInvoice,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["invoices"] });
+      return queryClient.invalidateQueries({ queryKey: ["invoices"] });
     },
   });
 }
@@ -61,9 +61,8 @@ export function useDeleteInvoice() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: deleteInvoice,
-    onSuccess: (_data, id) => {
-      queryClient.removeQueries({ queryKey: ["invoices", id] });
-      queryClient.invalidateQueries({ queryKey: ["invoices"] });
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["invoices"], exact: true });
     },
   });
 }
