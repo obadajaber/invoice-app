@@ -6,6 +6,7 @@ type Props = {
   onEdit?: () => void;
   onDelete?: () => void;
   onMarkPaid?: () => void;
+  isMarkingPaid?: boolean;
 };
 
 export default function InvoiceActions({
@@ -13,6 +14,7 @@ export default function InvoiceActions({
   onEdit,
   onDelete,
   onMarkPaid,
+  isMarkingPaid = false,
 }: Props) {
   return (
     <section className="mt-8 flex h-22.75 items-center justify-between rounded-lg bg-white px-6 shadow-sm md:h-auto md:px-8 md:py-5 dark:bg-dark-1 dark:shadow-none">
@@ -40,9 +42,10 @@ export default function InvoiceActions({
           <button
             type="button"
             onClick={onMarkPaid}
-            className="h-12 rounded-full bg-primary px-8 font-bold text-white hover:bg-primary-light md:px-6"
+            disabled={isMarkingPaid}
+            className="h-12 rounded-full bg-primary px-8 font-bold text-white hover:bg-primary-light disabled:cursor-not-allowed disabled:opacity-60 md:px-6"
           >
-            Mark as Paid
+            {isMarkingPaid ? "Updating…" : "Mark as Paid"}
           </button>
         )}
       </div>

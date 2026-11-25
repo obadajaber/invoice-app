@@ -13,6 +13,7 @@ import DeleteModal from "../components/DeleteModal";
 import InvoiceForm from "../components/InvoiceForm";
 import Loader from "../components/Loader";
 import ErrorState from "../components/ErrorState";
+import ErrorBanner from "../components/ErrorBanner";
 import { ApiError } from "../api/invoices";
 
 export default function InvoiceDetailPage() {
@@ -31,6 +32,15 @@ export default function InvoiceDetailPage() {
   const updateInvoice = useUpdateInvoice();
   const [showDelete, setShowDelete] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
+  function handleCloseDelete() {
+    deleteInvoice.reset();
+    setShowDelete(false);
+  }
+
+  function handleCloseEdit() {
+    updateInvoice.reset();
+    setShowEdit(false);
+  }
   if (isPending) {
     return (
       <div>
@@ -88,7 +98,14 @@ export default function InvoiceDetailPage() {
         onEdit={() => setShowEdit(true)}
         onDelete={() => setShowDelete(true)}
         onMarkPaid={() => markPaid.mutate(invoice.id)}
+        isMarkingPaid={markPaid.isPending}
       />
+
+      {markPaid.isError && (
+        <div className="mt-4">
+          <ErrorBanner message="Couldn't mark the invoice as paid. Please try again." />
+        </div>
+      )}
 
       <div className="mt-4 rounded-lg bg-white shadow-sm md:mt-6 lg:mt-4 dark:bg-dark-1 dark:shadow-none">
         <InvoiceInfo invoice={invoice} />
@@ -100,7 +117,13 @@ export default function InvoiceDetailPage() {
       {showDelete && (
         <DeleteModal
           invoiceId={invoice.id}
-          onCancel={() => setShowDelete(false)}
+          onCancel={handleCloseDelete}
+          error={
+            deleteInvoice.isError
+              ? "Couldn't delete the invoice. Please try again."
+              : null
+          }
+          isDeleting={deleteInvoice.isPending}
           onConfirm={() => {
             deleteInvoice.mutate(invoice.id, {
               onSuccess: () => navigate("/"),
@@ -112,7 +135,13 @@ export default function InvoiceDetailPage() {
       {showEdit && (
         <InvoiceForm
           invoice={invoice}
-          onClose={() => setShowEdit(false)}
+          onClose={handleCloseEdit}
+          error={
+            updateInvoice.isError
+              ? "Couldn't save the changes. Please try again."
+              : null
+          }
+          isSaving={updateInvoice.isPending}
           onSave={(updated, clearDraft) => {
             updateInvoice.mutate(updated, {
               onSuccess: () => {
