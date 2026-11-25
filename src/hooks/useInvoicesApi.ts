@@ -8,6 +8,7 @@ import {
   updateInvoice,
 } from "../api/invoices";
 import { ApiError } from "../api/invoices";
+import type { Invoice } from "../types/invoice";
 
 export function useInvoicesQuery() {
   return useQuery({
@@ -61,7 +62,10 @@ export function useDeleteInvoice() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: deleteInvoice,
-    onSuccess: () => {
+    onSuccess: (_data, id) => {
+      queryClient.setQueryData<Invoice[]>(["invoices"], (old) =>
+        old?.filter((inv) => inv.id !== id),
+      );
       queryClient.invalidateQueries({ queryKey: ["invoices"], exact: true });
     },
   });
