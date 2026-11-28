@@ -16,6 +16,7 @@ import Loader from "../components/Loader";
 import ErrorState from "../components/ErrorState";
 import ErrorBanner from "../components/ErrorBanner";
 import { ApiError } from "../api/invoices";
+import arrowLeft from "../assets/icon-arrow-left.svg";
 
 export default function InvoiceDetailPage() {
   const { id } = useParams();
@@ -57,7 +58,11 @@ export default function InvoiceDetailPage() {
   if (isPending) {
     return (
       <div>
-        <Link to="/" className="font-bold dark:text-white">
+        <Link
+          to="/"
+          className="flex w-fit items-center gap-5 font-bold hover:text-muted-2 lg:gap-6 dark:text-white dark:hover:text-muted-2"
+        >
+          <img src={arrowLeft} alt="" />
           Go back
         </Link>
         <Loader label="Loading invoice…" />
@@ -69,7 +74,11 @@ export default function InvoiceDetailPage() {
     const notFound = error instanceof ApiError && error.status === 404;
     return (
       <div>
-        <Link to="/" className="font-bold dark:text-white">
+        <Link
+          to="/"
+          className="flex w-fit items-center gap-5 font-bold hover:text-muted-2 lg:gap-6 dark:text-white dark:hover:text-muted-2"
+        >
+          <img src={arrowLeft} alt="" />
           Go back
         </Link>
         {notFound ? (
