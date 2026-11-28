@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate, useParams } from "react-router";
 import {
   useInvoiceQuery,
@@ -19,6 +20,18 @@ import { ApiError } from "../api/invoices";
 export default function InvoiceDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const deletedIdRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (deletedIdRef.current) {
+        queryClient.removeQueries({
+          queryKey: ["invoices", deletedIdRef.current],
+        });
+      }
+    };
+  }, [queryClient]);
   const {
     data: invoice,
     isPending,
@@ -126,7 +139,10 @@ export default function InvoiceDetailPage() {
           isDeleting={deleteInvoice.isPending}
           onConfirm={() => {
             deleteInvoice.mutate(invoice.id, {
-              onSuccess: () => navigate("/"),
+              onSuccess: () => {
+                deletedIdRef.current = invoice.id;
+                navigate("/");
+              },
             });
           }}
         />
