@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import FormField from "./FormField";
 import ErrorBanner from "./ErrorBanner";
 import type { Invoice } from "../types/invoice";
@@ -231,15 +231,22 @@ export default function InvoiceForm({
     onSave(build("draft"), clearDraft);
   }
 
+  function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    handleSend();
+  }
+
   return (
     <div
       className="fixed inset-x-0 top-18 bottom-0 z-40 bg-black/50 md:top-20 lg:top-0"
       onClick={onClose}
     >
-      <aside
+      <form
         role="dialog"
         aria-modal="true"
         aria-label={isEdit ? "Edit invoice" : "New invoice"}
+        onSubmit={handleSubmit}
+        noValidate
         onClick={(e) => e.stopPropagation()}
         className="absolute inset-y-0 left-0 flex w-full flex-col bg-white md:w-154 md:rounded-r-[20px] lg:left-25.75 dark:bg-dark-bg"
       >
@@ -477,8 +484,7 @@ export default function InvoiceForm({
                   Cancel
                 </button>
                 <button
-                  type="button"
-                  onClick={handleSend}
+                  type="submit"
                   disabled={isSaving}
                   className="h-12 rounded-full bg-primary px-6 font-bold text-white hover:bg-primary-light disabled:cursor-not-allowed disabled:opacity-60"
                 >
@@ -506,8 +512,7 @@ export default function InvoiceForm({
                   Save as Draft
                 </button>
                 <button
-                  type="button"
-                  onClick={handleSend}
+                  type="submit"
                   disabled={isSaving}
                   className="h-12 rounded-full bg-primary px-4 font-bold text-white hover:bg-primary-light disabled:cursor-not-allowed disabled:opacity-60 md:px-6"
                 >
@@ -517,7 +522,7 @@ export default function InvoiceForm({
             </>
           )}
         </div>
-      </aside>
+      </form>
     </div>
   );
 }
